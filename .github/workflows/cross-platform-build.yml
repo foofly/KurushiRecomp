@@ -3,6 +3,7 @@ name: Cross-platform build
 on:
   push:
     branches: [master, main]
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
 
@@ -44,6 +45,11 @@ jobs:
             libxcursor-dev libxfixes-dev libxi-dev libxinerama-dev \
             libxkbcommon-dev libxrandr-dev libxss-dev libxtst-dev pkg-config
 
+      - name: Install zip utility on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: choco install zip --no-progress -y
+
       - name: Check out source and framework submodules
         uses: actions/checkout@v4
         with:
@@ -56,6 +62,26 @@ jobs:
             git -C psxrecomp apply --check "$GITHUB_WORKSPACE/psxrecomp-post-aa.patch"
             git -C psxrecomp apply "$GITHUB_WORKSPACE/psxrecomp-post-aa.patch"
           fi
+
+      - name: Check release tag matches project version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          project_version="$(tr -d '[:space:]' < VERSION)"
+          if [[ "$tag_version" != "$project_version" ]]; then
+            echo "Release tag v${tag_version} must match VERSION (${project_version})." >&2
+            exit 1
+          fi
+
+      - name: Fetch Windows emitter toolchain
+        if: runner.os == 'Windows'
+        uses: ./psxrecomp/.github/actions/fetch-toolchain
+        with:
+          artifact: windows-x64
+
+      - name: Build local code generators
+        uses: ./psxrecomp/.github/actions/build-emitters
 
       - name: Configure
         run: >-
@@ -70,20 +96,64 @@ jobs:
       - name: Build runtime setup host
         run: cmake --build build-ci --target psx-runtime --parallel 2
 
-      - name: Include third-party notices
-        run: cmake -E copy_if_different THIRD_PARTY_NOTICES.md build-ci/THIRD_PARTY_NOTICES.md
+      - name: Package self-contained setup host
+        shell: bash
+        run: |
+          bash psxrecomp/tools/package_setup_host.sh \
+            --root "$GITHUB_WORKSPACE" \
+            --build-dir build-ci \
+            --recompiler-build build-recompiler \
+            --artifact "${{ matrix.artifact }}" \
+            --zip-prefix kurushi \
+            --exe-name Kurushi_Recompiled \
+            --display-name "Kurushi Recompiled" \
+            --disc-hint "your legally obtained USA I.Q. disc image" \
+            --project-dir assets \
+            --project-file game_options.toml \
+            --project-file LICENSE \
+            --project-file THIRD_PARTY_NOTICES.md
 
-      - name: Upload setup host artifact
+      - name: Upload platform setup package
         uses: actions/upload-artifact@v4
         with:
-          name: kurushi-${{ matrix.artifact }}-setup-host
-          path: |
-            build-ci/Kurushi_Recompiled*
-            build-ci/game.toml
-            build-ci/game_options.toml
-            build-ci/THIRD_PARTY_NOTICES.md
-            build-ci/assets/
-            build-ci/bios/
-            build-ci/mods/
+          name: kurushi-${{ matrix.artifact }}-setup-package
+          path: dist/kurushi-*-${{ matrix.artifact }}.zip
           if-no-files-found: error
           retention-days: 14
+
+  publish-release:
+    name: Publish platform downloads
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download platform packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: kurushi-*-setup-package
+          path: release-assets
+          merge-multiple: true
+
+      - name: Verify packages and create checksums
+        shell: bash
+        run: |
+          shopt -s nullglob
+          packages=(release-assets/kurushi-*.zip)
+          if [[ "${#packages[@]}" -ne 5 ]]; then
+            echo "Expected five platform packages, found ${#packages[@]}" >&2
+            ls -la release-assets >&2
+            exit 1
+          fi
+          (cd release-assets && sha256sum kurushi-*.zip > SHA256SUMS)
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Kurushi Recompiled ${{ github.ref_name }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            release-assets/kurushi-*.zip
+            release-assets/SHA256SUMS
