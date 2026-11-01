@@ -6,23 +6,25 @@ The project provides a launcher and a setup package. You supply your own game di
 
 ## Play
 
-Download the ZIP for your platform from [Releases](https://github.com/foofly/KurushiRecomp/releases/latest):
+Download the ZIP for your platform from the [v0.1.0 release](https://github.com/foofly/KurushiRecomp/releases/tag/v0.1.0). Future versions will be listed on the [Releases page](https://github.com/foofly/KurushiRecomp/releases).
 
 | Platform | Artifact |
 | --- | --- |
-| Linux x64 | `kurushi-<version>-linux-x64.zip` |
-| Linux ARM64 | `kurushi-<version>-linux-arm64.zip` |
-| Windows x64 | `kurushi-<version>-windows-x64.zip` |
-| macOS Intel | `kurushi-<version>-macos-intel.zip` |
-| macOS Apple Silicon | `kurushi-<version>-macos-arm64.zip` |
+| Linux x64 | `kurushi-0.1.0-linux-x64.zip` |
+| Linux ARM64 | `kurushi-0.1.0-linux-arm64.zip` |
+| Windows x64 | `kurushi-0.1.0-windows-x64.zip` |
+| macOS Intel | `kurushi-0.1.0-macos-intel.zip` |
+| macOS Apple Silicon | `kurushi-0.1.0-macos-arm64.zip` |
 
-Extract the package and run `Kurushi_Recompiled` (`Kurushi_Recompiled.exe` on Windows). On macOS, run `chmod +x ./Kurushi_Recompiled` first if needed.
+Download `SHA256SUMS` from the same release if you want to verify the ZIP. On Linux or macOS, put it beside the downloaded ZIP and run `sha256sum -c SHA256SUMS`. On Windows, compare the output of `Get-FileHash .\kurushi-0.1.0-windows-x64.zip -Algorithm SHA256` with the Windows entry in `SHA256SUMS`.
+
+Extract the ZIP and run `Kurushi_Recompiled` (`Kurushi_Recompiled.exe` on Windows). On macOS, run `chmod +x ./Kurushi_Recompiled` first if needed.
 
 On first launch, the setup screen asks for your legally obtained USA disc image. For a CUE/BIN dump, choose the `.cue` file. Choose **Generate & rebuild** to create the playable game on your computer. Windows downloads the build toolchain; Linux and macOS use the native build tools installed on your system. When the build finishes, the launcher opens the game and remembers the disc path. Use **Load Disc Image** in the launcher to choose or change the image for a later launch.
 
 On Linux and macOS, install CMake, Ninja, Python 3, and a C/C++ compiler if they are not already available. Windows users need Python 3. The setup package includes the project source, PSXRecomp tools, and the launcher; it does not include game data.
 
-Each versioned `vX.Y.Z` tag builds and publishes all five platform ZIPs together. The release also includes `SHA256SUMS` for verifying downloads. For in-progress builds, see the [Actions workflow](https://github.com/foofly/KurushiRecomp/actions/workflows/cross-platform-build.yml); those artifacts expire after 14 days.
+Each versioned `vX.Y.Z` tag builds and publishes all five platform ZIPs together. For in-progress builds, see the [Actions workflow](https://github.com/foofly/KurushiRecomp/actions/workflows/cross-platform-build.yml); those artifacts expire after 14 days.
 
 ## Controls
 
