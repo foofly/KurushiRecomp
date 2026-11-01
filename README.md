@@ -32,6 +32,26 @@ For a normal direct launch, run `./play.sh`. Open the launcher with `./play.sh -
 ./play.sh --disc "/path/to/your/I.Q.cue"
 ```
 
+## Continuous integration builds
+
+Each successful [Cross-platform build workflow](https://github.com/foofly/KurushiRecomp/actions/workflows/cross-platform-build.yml) run retains a setup host artifact for 14 days. Open the run, use **Artifacts** at the bottom, and download the artifact matching your platform:
+
+| Platform | Artifact |
+| --- | --- |
+| Linux x64 | `kurushi-linux-x64-setup-host` |
+| Linux ARM64 | `kurushi-linux-arm64-setup-host` |
+| Windows x64 | `kurushi-windows-x64-setup-host` |
+| macOS Intel | `kurushi-macos-intel-setup-host` |
+| macOS Apple Silicon | `kurushi-macos-arm64-setup-host` |
+
+Extract the downloaded archive. It contains the runtime executable and its staged configuration, BIOS, assets, and bundled mods. Start it from the extracted folder:
+
+- **Linux x64 / ARM64:** run `./Kurushi_Recompiled` in a terminal.
+- **Windows x64:** run `Kurushi_Recompiled.exe`, or in PowerShell use `./Kurushi_Recompiled.exe`.
+- **macOS Intel / Apple Silicon:** in Terminal, run `chmod +x ./Kurushi_Recompiled && ./Kurushi_Recompiled`.
+
+These downloads are **setup host builds**, not playable game builds. They verify that the runtime compiles for each platform, but contain no generated game code or disc image. To build and play the game, generate code from your own USA disc on that platform and follow [Build](#build). The Actions artifacts are temporary CI outputs, not releases.
+
 ## Enhancements
 
 The launcher Mods page contains optional Fit widescreen, Faster CD loading, Anti-aliasing, and Smooth motion features. Internal Resolution, PGXP Precision, Rewind, and other framework features are available in the same Mods page. Higher resolutions and some visual options require OpenGL. Smooth motion blends presentation frames without changing the game's simulation speed; moving objects can show trails.

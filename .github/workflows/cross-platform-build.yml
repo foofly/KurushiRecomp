@@ -1,0 +1,88 @@
+name: Cross-platform build
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux x64
+            runner: ubuntu-24.04
+            artifact: linux-x64
+          - name: Linux ARM64
+            runner: ubuntu-24.04-arm
+            artifact: linux-arm64
+          - name: Windows x64
+            runner: windows-2022
+            artifact: windows-x64
+          - name: macOS Intel
+            runner: macos-15-intel
+            artifact: macos-intel
+          - name: macOS Apple Silicon
+            runner: macos-14
+            artifact: macos-arm64
+
+    steps:
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libasound2-dev libdecor-0-dev libegl1-mesa-dev libgl1-mesa-dev \
+            libpipewire-0.3-dev libwayland-dev libx11-dev libx11-xcb-dev \
+            libxcursor-dev libxfixes-dev libxi-dev libxinerama-dev \
+            libxkbcommon-dev libxrandr-dev libxss-dev libxtst-dev pkg-config
+
+      - name: Check out source and framework submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Apply tracked framework API patch
+        shell: bash
+        run: |
+          if ! grep -q 'int psx_mod_set_post_aa(' psxrecomp/runtime/include/mod_plugins.h; then
+            git -C psxrecomp apply --check "$GITHUB_WORKSPACE/psxrecomp-post-aa.patch"
+            git -C psxrecomp apply "$GITHUB_WORKSPACE/psxrecomp-post-aa.patch"
+          fi
+
+      - name: Configure
+        run: >-
+          cmake -S . -B build-ci -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DPSX_EXECUTION_PROFILE=REFERENCE
+          -DPSX_GL_BATCH_IMPL=LLE
+          -DPSX_ENABLE_VULKAN=OFF
+          -DPSX_DEBUG_TOOLS=OFF
+
+      - name: Build runtime setup host
+        run: cmake --build build-ci --target psx-runtime --parallel 2
+
+      - name: Include third-party notices
+        run: cmake -E copy_if_different THIRD_PARTY_NOTICES.md build-ci/THIRD_PARTY_NOTICES.md
+
+      - name: Upload setup host artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kurushi-${{ matrix.artifact }}-setup-host
+          path: |
+            build-ci/Kurushi_Recompiled*
+            build-ci/game.toml
+            build-ci/game_options.toml
+            build-ci/THIRD_PARTY_NOTICES.md
+            build-ci/assets/
+            build-ci/bios/
+            build-ci/mods/
+          if-no-files-found: error
+          retention-days: 14
