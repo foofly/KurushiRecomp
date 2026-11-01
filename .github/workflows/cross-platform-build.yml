@@ -63,6 +63,24 @@ jobs:
             git -C psxrecomp apply "$GITHUB_WORKSPACE/psxrecomp-post-aa.patch"
           fi
 
+      - name: Apply macOS setup packaging Bash compatibility patch
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          script = Path("psxrecomp/tools/stage_setup_sdk.sh")
+          source = script.read_text()
+          old = '"${bios_args[@]}"'
+          new = '"${bios_args[@]+"${bios_args[@]}"}"'
+          if old in source:
+              source = source.replace(old, new, 1)
+          elif new not in source:
+              raise SystemExit("could not find empty-array expansion in stage_setup_sdk.sh")
+          script.write_text(source)
+          PY
+
       - name: Check release tag matches project version
         if: startsWith(github.ref, 'refs/tags/v')
         shell: bash
