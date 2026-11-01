@@ -1,0 +1,54 @@
+# Autofilled by tools/new_project_layout/probe_disc.py from your legal dump.
+# Review before shipping. Runtime quirks / overlay seeds still need hand work.
+
+[game]
+name = "Kurushi"
+id = "SCUS-94181"
+players = 1
+exe = "disc/SCUS_941.81"
+disc = "/var/home/bill/git/IQ/I.Q - Intelligent Qube (USA)/I.Q - Intelligent Qube (USA).cue"
+load_address = "0x80010000"
+entry_pc = "0x8003A838"
+text_size = "0x0005C800"
+stack_base = "0x801FFFF0"
+
+# Digests are for data Track 01 (first BINARY FILE / TRACK 01).
+[prepare_disc]
+out_dir = "disc"
+bin_name = "I.Q - Intelligent Qube (USA).bin"
+cue_name = "I.Q - Intelligent Qube (USA).cue"
+boot_exe = "SCUS_941.81"
+known_sizes = [251447616]
+known_md5 = [
+  "535009e988fec452e98b49fccda63e6e",
+]
+known_sha1 = [
+  "b6878e86c83f277b5267caa9aacaea3c7fd24f44",
+]
+known_crc32 = [
+  "8fafdf9c",
+]
+
+[recompiler]
+seeds = "seeds/ghidra_funcs.txt"
+out_dir = "generated"
+strict = true
+
+[runtime]
+window_title = "Kurushi Recompiled"
+memcard_dir = "saves"
+overlay_cache = true
+
+[video]
+renderer = "opengl"
+aspect_ratio = "4:3"
+
+[controller]
+default_mode = "digital"
+
+# Online mount gate: digests + track count + optional TOC fingerprint
+# (see docs/NETPLAY.md).
+[netplay]
+require_cue = true
+required_tracks = 1
+required_disc_fp = "8e4b520ded700e91d76106d92e42278d174aed16502e14d5286226a919f9ec49"

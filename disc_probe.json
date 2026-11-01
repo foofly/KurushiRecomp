@@ -1,0 +1,31 @@
+{
+  "cue_path": "/var/home/bill/git/IQ/I.Q - Intelligent Qube (USA)/I.Q - Intelligent Qube (USA).cue",
+  "cue_name": "I.Q - Intelligent Qube (USA).cue",
+  "bin_name": "I.Q - Intelligent Qube (USA).bin",
+  "track_count": 1,
+  "data_track_size": 251447616,
+  "data_track_md5": "535009e988fec452e98b49fccda63e6e",
+  "data_track_sha1": "b6878e86c83f277b5267caa9aacaea3c7fd24f44",
+  "data_track_crc32": "8fafdf9c",
+  "boot_exe": "SCUS_941.81",
+  "serial": "SCUS-94181",
+  "serial_exe": "SCUS_941.81",
+  "volume_id": "",
+  "display_name": "Kurushi",
+  "load_address": "0x80010000",
+  "entry_pc": "0x8003A838",
+  "text_size": "0x0005C800",
+  "stack_base": "0x801FFFF0",
+  "require_cue": true,
+  "required_disc_fp": "8e4b520ded700e91d76106d92e42278d174aed16502e14d5286226a919f9ec49",
+  "boot_exe_sha256": "d50ad4021427e38217dd15ee149d750a4e2a32d5efe539a365b5f013e3b32540",
+  "seed_count": 533,
+  "warnings": [
+    "cue has only 1 TRACK \u2014 Track-01-only dumps fail multi-track netplay/catalog gates; prefer a full Redump cue."
+  ],
+  "notes": [
+    "entry_pc/load_address/text_size/stack_base taken from PS-X EXE header.",
+    "seeds are first-pass boot-EXE JAL targets (+ entry); expect to grow as overlays / runtime paths are discovered.",
+    "required_disc_fp is psxrecomp-toc-v1 (matches runtime DiscIdentity)."
+  ]
+}
