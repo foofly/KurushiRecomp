@@ -1,5 +1,5 @@
 diff --git a/host/psxrecomp_codegen_host.c b/host/psxrecomp_codegen_host.c
-index dec25b94..c88b0c22 100644
+index dec25b94..603b049d 100644
 --- a/host/psxrecomp_codegen_host.c
 +++ b/host/psxrecomp_codegen_host.c
 @@ -803,2 +803,2 @@ static void activate_toolchain_path(void) {
@@ -20,42 +20,40 @@ index dec25b94..c88b0c22 100644
 +    return 0;
 +}
 +
-@@ -3415,3 +3426,2 @@ static int host_toolchain_is_ready(void) {
--#if !defined(_WIN32)
+@@ -3416 +3427,2 @@ static int host_toolchain_is_ready(void) {
 -    return host_system_toolchain_ready();
--#endif
 +    if (host_system_toolchain_ready())
 +        return 1;
-@@ -3439,0 +3450,5 @@ static int host_toolchain_is_ready(void) {
+@@ -3439,0 +3452,5 @@ static int host_toolchain_is_ready(void) {
 +#endif
 +#if defined(__aarch64__) && !defined(__APPLE__)
 +    snprintf(g_tc_repair_note, sizeof(g_tc_repair_note),
 +             "No portable build toolchain is published for Linux ARM64. "
 +             "Install CMake, Ninja, Python 3 and C/C++ compilers.");
-@@ -3627,4 +3641,0 @@ static int host_ensure_toolchain_with_progress(
+@@ -3627,4 +3643,0 @@ static int host_ensure_toolchain_with_progress(
 -    snprintf(err_msg, err_cap,
 -             "Native build tools are missing. Install CMake, Ninja, Python 3, "
 -             "and C/C++ compilers with your package manager, then check tools again.");
 -    return 0;
-@@ -3635 +3646 @@ static int host_ensure_toolchain_with_progress(
+@@ -3635 +3648 @@ static int host_ensure_toolchain_with_progress(
 -        return 1;
 +        return host_require_system_compiler(err_msg, err_cap);
-@@ -3644 +3655 @@ static int host_ensure_toolchain_with_progress(
+@@ -3644 +3657 @@ static int host_ensure_toolchain_with_progress(
 -            if (host_portable_cmake_ready())
 +            if (host_portable_cmake_ready() && host_system_compiler_ready())
-@@ -3661 +3672 @@ static int host_ensure_toolchain_with_progress(
+@@ -3661 +3674 @@ static int host_ensure_toolchain_with_progress(
 -        return 1;
 +        return host_require_system_compiler(err_msg, err_cap);
-@@ -3669 +3680 @@ static int host_ensure_toolchain_with_progress(
+@@ -3669 +3682 @@ static int host_ensure_toolchain_with_progress(
 -                return 1;
 +                return host_require_system_compiler(err_msg, err_cap);
-@@ -3683,0 +3695,5 @@ static int host_ensure_toolchain_with_progress(
+@@ -3683,0 +3697,5 @@ static int host_ensure_toolchain_with_progress(
 +        if (!toolchain_zip_asset_name()) {
 +            snprintf(err_msg, err_cap,
 +                     "No portable build toolchain is published for this platform.");
 +            return 0;
 +        }
-@@ -3692 +3708 @@ static int host_ensure_toolchain_with_progress(
+@@ -3692 +3710 @@ static int host_ensure_toolchain_with_progress(
 -                return 1;
 +                return host_require_system_compiler(err_msg, err_cap);
 diff --git a/tools/toolchain_pack.py b/tools/toolchain_pack.py
