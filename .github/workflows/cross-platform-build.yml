@@ -63,6 +63,12 @@ jobs:
             git -C psxrecomp apply "$GITHUB_WORKSPACE/psxrecomp-post-aa.patch"
           fi
 
+      - name: Enable portable toolchain downloads on Linux and macOS
+        shell: bash
+        run: |
+          git -C psxrecomp apply --unidiff-zero --check "$GITHUB_WORKSPACE/psxrecomp-portable-toolchain-posix.patch"
+          git -C psxrecomp apply --unidiff-zero "$GITHUB_WORKSPACE/psxrecomp-portable-toolchain-posix.patch"
+
       - name: Apply macOS setup packaging Bash compatibility patch
         if: runner.os == 'macOS'
         shell: bash

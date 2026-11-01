@@ -20,9 +20,11 @@ Download `SHA256SUMS` from the same release if you want to verify the ZIP. On Li
 
 Extract the ZIP and run `Kurushi_Recompiled` (`Kurushi_Recompiled.exe` on Windows). On macOS, run `chmod +x ./Kurushi_Recompiled` first if needed.
 
-On first launch, the setup screen asks for your legally obtained USA disc image. For a CUE/BIN dump, choose the `.cue` file. Choose **Generate & rebuild** to create the playable game on your computer. Windows downloads the build toolchain; Linux and macOS use the native build tools installed on your system. When the build finishes, the launcher opens the game and remembers the disc path. Use **Load Disc Image** in the launcher to choose or change the image for a later launch.
+On first launch, the setup screen asks for your legally obtained USA disc image. For a CUE/BIN dump, choose the `.cue` file. Choose **Generate & rebuild** to create the playable game on your computer. Windows and Linux x64 download the build toolchain automatically when needed. macOS downloads CMake, Ninja, and Python automatically, but Apple’s Command Line Tools must be installed first (`xcode-select --install` in Terminal). Linux ARM64 needs CMake, Ninja, Python 3, and C/C++ compilers installed from the system package manager because no portable ARM64 toolchain is currently published. When the build finishes, the launcher opens the game and remembers the disc path. Use **Load Disc Image** in the launcher to choose or change the image for a later launch.
 
-On Linux and macOS, install CMake, Ninja, Python 3, and a C/C++ compiler if they are not already available. Windows users need Python 3. The setup package includes the project source, PSXRecomp tools, and the launcher; it does not include game data.
+The v0.1.0 downloads predate automatic toolchain downloads on Linux and macOS; they require the native build tools to be installed.
+
+The setup package includes the project source, PSXRecomp tools, and the launcher; it does not include game data. Portable build tools are downloaded from the upstream [RetroPorting Toolchains releases](https://github.com/RetroPortingToolKit/RetroPorting-Toolchains/releases) and stored in the user’s toolchain cache. Windows, Linux x64, and macOS need an internet connection the first time the launcher prepares the build. macOS also requires Apple’s Command Line Tools. Linux ARM64 users need to install the listed build tools themselves.
 
 Each versioned `vX.Y.Z` tag builds and publishes all five platform ZIPs together. For in-progress builds, see the [Actions workflow](https://github.com/foofly/KurushiRecomp/actions/workflows/cross-platform-build.yml); those artifacts expire after 14 days.
 
