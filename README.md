@@ -6,25 +6,25 @@ The project provides a launcher and a setup package. You supply your own game di
 
 ## Play
 
-Download the ZIP for your platform from the [v0.1.1 release](https://github.com/foofly/KurushiRecomp/releases/tag/v0.1.1). Future versions will be listed on the [Releases page](https://github.com/foofly/KurushiRecomp/releases).
+Download the ZIP for your platform from the [v0.1.2 release](https://github.com/foofly/KurushiRecomp/releases/tag/v0.1.2). Future versions will be listed on the [Releases page](https://github.com/foofly/KurushiRecomp/releases).
 
 | Platform | Artifact |
 | --- | --- |
-| Linux x64 | `kurushi-0.1.1-linux-x64.zip` |
-| Linux ARM64 | `kurushi-0.1.1-linux-arm64.zip` |
-| Windows x64 | `kurushi-0.1.1-windows-x64.zip` |
-| macOS Intel | `kurushi-0.1.1-macos-intel.zip` |
-| macOS Apple Silicon | `kurushi-0.1.1-macos-arm64.zip` |
+| Linux x64 | `kurushi-0.1.2-linux-x64.zip` |
+| Linux ARM64 | `kurushi-0.1.2-linux-arm64.zip` |
+| Windows x64 | `kurushi-0.1.2-windows-x64.zip` |
+| macOS Intel | `kurushi-0.1.2-macos-intel.zip` |
+| macOS Apple Silicon | `kurushi-0.1.2-macos-arm64.zip` |
 
-Download `SHA256SUMS` from the same release if you want to verify the ZIP. On Linux or macOS, put it beside the downloaded ZIP and run `sha256sum -c SHA256SUMS`. On Windows, compare the output of `Get-FileHash .\kurushi-0.1.1-windows-x64.zip -Algorithm SHA256` with the Windows entry in `SHA256SUMS`.
+Download `SHA256SUMS` from the same release if you want to verify the ZIP. On Linux or macOS, put it beside the downloaded ZIP and run `sha256sum -c SHA256SUMS`. On Windows, compare the output of `Get-FileHash .\kurushi-0.1.2-windows-x64.zip -Algorithm SHA256` with the Windows entry in `SHA256SUMS`.
 
 Extract the ZIP and run `Kurushi_Recompiled` (`Kurushi_Recompiled.exe` on Windows). On macOS, run `chmod +x ./Kurushi_Recompiled` first if needed.
 
-On first launch, the setup screen asks for your legally obtained USA disc image. For a CUE/BIN dump, choose the `.cue` file. Choose **Generate & rebuild** to create the playable game on your computer. Windows and Linux x64 download the build toolchain automatically when needed. macOS downloads CMake, Ninja, and Python automatically, but Apple’s Command Line Tools must be installed first (`xcode-select --install` in Terminal). Linux ARM64 needs CMake, Ninja, Python 3, and C/C++ compilers installed from the system package manager because no portable ARM64 toolchain is currently published. When the build finishes, the launcher opens the game and remembers the disc path. Use **Load Disc Image** in the launcher to choose or change the image for a later launch.
+On first launch, the setup screen asks for your legally obtained USA disc image. For a CUE/BIN dump, choose the `.cue` file. Choose **Generate & rebuild** to create the playable game on your computer. Windows, Linux x64, and macOS releases include their platform build tools, so the launcher does not need to download a toolchain. macOS still requires Apple’s Command Line Tools (`xcode-select --install` in Terminal). Linux ARM64 has no published portable toolchain pack and requires CMake, Ninja, Python 3, and C/C++ compilers from the system package manager. When the build finishes, the launcher opens the game and remembers the disc path. Use **Load Disc Image** in the launcher to choose or change the image for a later launch.
 
-The v0.1.0 downloads predate automatic toolchain downloads on Linux and macOS; they require the native build tools to be installed.
+The v0.1.0 and v0.1.1 downloads do not include the build tools. Use v0.1.2 or newer for bundled tools on Windows, Linux x64, and macOS.
 
-The setup package includes the project source, PSXRecomp tools, and the launcher; it does not include game data. Portable build tools are downloaded from the upstream [RetroPorting Toolchains releases](https://github.com/RetroPortingToolKit/RetroPorting-Toolchains/releases) and stored in the user’s toolchain cache. Windows, Linux x64, and macOS need an internet connection the first time the launcher prepares the build. macOS also requires Apple’s Command Line Tools. Linux ARM64 users need to install the listed build tools themselves.
+The setup package includes the project source, PSXRecomp tools, launcher, and platform build toolchain where available; it does not include game data. Bundled toolchain components retain their upstream licenses and notices under `toolchain/`. The Linux x64 ZIP is larger because it includes the compiler and dependencies. Linux ARM64 users need to install the listed build tools themselves.
 
 Each versioned `vX.Y.Z` tag builds and publishes all five platform ZIPs together. For in-progress builds, see the [Actions workflow](https://github.com/foofly/KurushiRecomp/actions/workflows/cross-platform-build.yml); those artifacts expire after 14 days.
 

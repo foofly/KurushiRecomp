@@ -1,0 +1,78 @@
+diff --git a/tools/package_setup_host.sh b/tools/package_setup_host.sh
+index f71db2dc..9fd100d5 100755
+--- a/tools/package_setup_host.sh
++++ b/tools/package_setup_host.sh
+@@ -539,2 +539,2 @@ One zip for first install and updates. Does NOT include disc images, retail
+-BIOS dumps, pre-generated game C, or a bundled build-tool pack. Emitters
+-(psxrecomp-game / psxrecomp-bios) and the CLI are inside psxrecomp/.
++BIOS dumps, or pre-generated game C. Emitters (psxrecomp-game / psxrecomp-bios)
++and the CLI are inside psxrecomp/.
+@@ -542,0 +543,12 @@ EOF
++if [[ "${EMBED_TOOLCHAIN}" -eq 1 ]]; then
++  cat >>"${STAGE}/README-SETUP.txt" <<'EOF'
++The platform build toolchain is bundled under toolchain/. Its license notices
++are included with that pack. No toolchain download is needed.
++EOF
++else
++  cat >>"${STAGE}/README-SETUP.txt" <<'EOF'
++No build toolchain is bundled. Install the platform build tools before running
++Generate & rebuild.
++EOF
++fi
++
+@@ -545 +557,11 @@ case "${ARTIFACT}" in
+-    cat >>"${STAGE}/README-SETUP.txt" <<EOF
++    if [[ "${EMBED_TOOLCHAIN}" -eq 1 ]]; then
++      cat >>"${STAGE}/README-SETUP.txt" <<EOF
++Standalone:
++1. Run ${EXE_BASENAME}.
++2. Provide ${DISC_HINT} and ${BIOS_HINT}.
++3. Follow the Generate & rebuild wizard; the build toolchain is included.
++
++Retro uses this same zip and preserves saves/user config across updates.
++EOF
++    else
++      cat >>"${STAGE}/README-SETUP.txt" <<EOF
+@@ -550,8 +572,3 @@ Standalone:
+-4. Follow the Generate & rebuild wizard. On first rebuild the host downloads
+-   cmake-clang-v1 from RetroPortingToolKit/RetroPorting-Toolchains (or you can
+-   pick a local cmake-clang-v1-*.zip for offline builds). System cmake/ninja
+-   also works if already on PATH.
+-
+-Retro uses this same zip: it harvests emitters into a shared SDK cache,
+-downloads the toolchain pack (or uses RETCOMM_TOOLCHAIN_DIR), and preserves
+-saves/user config across updates.
++4. Follow the Generate & rebuild wizard and install the requested tools.
++
++Retro uses this same zip and preserves saves/user config across updates.
+@@ -558,0 +576 @@ EOF
++    fi
+@@ -561 +579,17 @@ EOF
+-    cat >>"${STAGE}/README-SETUP.txt" <<EOF
++    if [[ "${EMBED_TOOLCHAIN}" -eq 1 ]]; then
++      cat >>"${STAGE}/README-SETUP.txt" <<EOF
++Standalone:
++1. Run ${EXE_BASENAME}.
++2. Provide ${DISC_HINT} and ${BIOS_HINT}.
++3. Follow the Generate & rebuild wizard; the build toolchain is included.
++
++Retro uses this same zip and preserves saves/user config across updates.
++EOF
++      if [[ "${ARTIFACT}" == macos-* ]]; then
++        cat >>"${STAGE}/README-SETUP.txt" <<'EOF'
++macOS still requires Apple's Command Line Tools. In Terminal, run:
++  xcode-select --install
++EOF
++      fi
++    else
++      cat >>"${STAGE}/README-SETUP.txt" <<EOF
+@@ -569,2 +603 @@ Standalone:
+-5. Follow the Generate & rebuild wizard. The host checks the native build
+-   tools before it continues.
++5. Follow the Generate & rebuild wizard.
+@@ -572,2 +605 @@ Standalone:
+-Retro uses this same zip. It uses the same native build tools and preserves
+-saves/user config across updates.
++Retro uses this same zip and preserves saves/user config across updates.
+@@ -574,0 +607 @@ EOF
++    fi

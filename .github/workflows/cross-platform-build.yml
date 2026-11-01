@@ -21,18 +21,23 @@ jobs:
           - name: Linux x64
             runner: ubuntu-24.04
             artifact: linux-x64
+            toolchain_artifact: linux-x64
           - name: Linux ARM64
             runner: ubuntu-24.04-arm
             artifact: linux-arm64
+            toolchain_artifact: none
           - name: Windows x64
             runner: windows-2022
             artifact: windows-x64
+            toolchain_artifact: windows-x64
           - name: macOS Intel
             runner: macos-15-intel
             artifact: macos-intel
+            toolchain_artifact: macos-x64
           - name: macOS Apple Silicon
             runner: macos-15
             artifact: macos-arm64
+            toolchain_artifact: macos-arm64
 
     steps:
       - name: Install Linux dependencies
@@ -69,6 +74,12 @@ jobs:
           git -C psxrecomp apply --unidiff-zero --check "$GITHUB_WORKSPACE/psxrecomp-portable-toolchain-posix.patch"
           git -C psxrecomp apply --unidiff-zero "$GITHUB_WORKSPACE/psxrecomp-portable-toolchain-posix.patch"
 
+      - name: Update setup package instructions for embedded tools
+        shell: bash
+        run: |
+          git -C psxrecomp apply --unidiff-zero --check "$GITHUB_WORKSPACE/psxrecomp-embedded-toolchain-packaging.patch"
+          git -C psxrecomp apply --unidiff-zero "$GITHUB_WORKSPACE/psxrecomp-embedded-toolchain-packaging.patch"
+
       - name: Apply macOS setup packaging Bash compatibility patch
         if: runner.os == 'macOS'
         shell: bash
@@ -98,11 +109,11 @@ jobs:
             exit 1
           fi
 
-      - name: Fetch Windows emitter toolchain
-        if: runner.os == 'Windows'
+      - name: Fetch platform toolchain for embedding
+        if: matrix.toolchain_artifact != 'none'
         uses: ./psxrecomp/.github/actions/fetch-toolchain
         with:
-          artifact: windows-x64
+          artifact: ${{ matrix.toolchain_artifact }}
 
       - name: Build local code generators
         uses: ./psxrecomp/.github/actions/build-emitters
@@ -141,7 +152,8 @@ jobs:
             --project-file codegen_setup.h \
             --project-file game_options.toml \
             --project-file LICENSE \
-            --project-file THIRD_PARTY_NOTICES.md
+            --project-file THIRD_PARTY_NOTICES.md \
+            ${{ matrix.toolchain_artifact != 'none' && '--embed-toolchain' || '--no-embed-toolchain' }}
 
       - name: Upload platform setup package
         uses: actions/upload-artifact@v4
