@@ -6,17 +6,17 @@ The project provides a launcher and a setup package. You supply your own game di
 
 ## Play
 
-Download the ZIP for your platform from the [v0.1.0 release](https://github.com/foofly/KurushiRecomp/releases/tag/v0.1.0). Future versions will be listed on the [Releases page](https://github.com/foofly/KurushiRecomp/releases).
+Download the ZIP for your platform from the [v0.1.1 release](https://github.com/foofly/KurushiRecomp/releases/tag/v0.1.1). Future versions will be listed on the [Releases page](https://github.com/foofly/KurushiRecomp/releases).
 
 | Platform | Artifact |
 | --- | --- |
-| Linux x64 | `kurushi-0.1.0-linux-x64.zip` |
-| Linux ARM64 | `kurushi-0.1.0-linux-arm64.zip` |
-| Windows x64 | `kurushi-0.1.0-windows-x64.zip` |
-| macOS Intel | `kurushi-0.1.0-macos-intel.zip` |
-| macOS Apple Silicon | `kurushi-0.1.0-macos-arm64.zip` |
+| Linux x64 | `kurushi-0.1.1-linux-x64.zip` |
+| Linux ARM64 | `kurushi-0.1.1-linux-arm64.zip` |
+| Windows x64 | `kurushi-0.1.1-windows-x64.zip` |
+| macOS Intel | `kurushi-0.1.1-macos-intel.zip` |
+| macOS Apple Silicon | `kurushi-0.1.1-macos-arm64.zip` |
 
-Download `SHA256SUMS` from the same release if you want to verify the ZIP. On Linux or macOS, put it beside the downloaded ZIP and run `sha256sum -c SHA256SUMS`. On Windows, compare the output of `Get-FileHash .\kurushi-0.1.0-windows-x64.zip -Algorithm SHA256` with the Windows entry in `SHA256SUMS`.
+Download `SHA256SUMS` from the same release if you want to verify the ZIP. On Linux or macOS, put it beside the downloaded ZIP and run `sha256sum -c SHA256SUMS`. On Windows, compare the output of `Get-FileHash .\kurushi-0.1.1-windows-x64.zip -Algorithm SHA256` with the Windows entry in `SHA256SUMS`.
 
 Extract the ZIP and run `Kurushi_Recompiled` (`Kurushi_Recompiled.exe` on Windows). On macOS, run `chmod +x ./Kurushi_Recompiled` first if needed.
 
