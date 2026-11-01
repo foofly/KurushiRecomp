@@ -109,6 +109,12 @@ jobs:
             --display-name "Kurushi Recompiled" \
             --disc-hint "your legally obtained USA I.Q. disc image" \
             --project-dir assets \
+            --project-dir seeds \
+            --project-file CMakeLists.txt \
+            --project-file game.toml \
+            --project-file VERSION \
+            --project-file codegen_setup.c \
+            --project-file codegen_setup.h \
             --project-file game_options.toml \
             --project-file LICENSE \
             --project-file THIRD_PARTY_NOTICES.md
