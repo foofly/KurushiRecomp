@@ -65,6 +65,7 @@ jobs:
           -DPSX_GL_BATCH_IMPL=LLE
           -DPSX_ENABLE_VULKAN=OFF
           -DPSX_DEBUG_TOOLS=OFF
+          -DPSX_SETUP_WIZARD=ON
 
       - name: Build runtime setup host
         run: cmake --build build-ci --target psx-runtime --parallel 2

@@ -32,9 +32,29 @@ For a normal direct launch, run `./play.sh`. Open the launcher with `./play.sh -
 ./play.sh --disc "/path/to/your/I.Q.cue"
 ```
 
-## Continuous integration builds
+## Run a CI build
 
-Each successful [Cross-platform build workflow](https://github.com/foofly/KurushiRecomp/actions/workflows/cross-platform-build.yml) run retains a setup host artifact for 14 days. Open the run, use **Artifacts** at the bottom, and download the artifact matching your platform:
+The [Cross-platform build workflow](https://github.com/foofly/KurushiRecomp/actions/workflows/cross-platform-build.yml) builds setup hosts for Linux x64, Linux ARM64, Windows x64, macOS Intel, and Apple Silicon. Each artifact is retained for 14 days. These hosts do not contain game code or a disc image. They open the first-run wizard, where you select your own disc and generate the game locally.
+
+First, clone the source with its submodules. The setup wizard needs the local PSXRecomp CLI and source tree to generate and rebuild the game. Apply the tracked anti-aliasing API patch as well:
+
+```sh
+git clone --recurse-submodules https://github.com/foofly/KurushiRecomp.git
+cd KurushiRecomp
+if ! grep -q 'int psx_mod_set_post_aa(' psxrecomp/runtime/include/mod_plugins.h; then
+  git -C psxrecomp apply "$PWD/psxrecomp-post-aa.patch"
+fi
+```
+
+For Windows PowerShell, use this patch check instead:
+
+```powershell
+if (-not (Select-String -Quiet -Path psxrecomp/runtime/include/mod_plugins.h -Pattern 'int psx_mod_set_post_aa\(')) {
+  git -C psxrecomp apply (Join-Path $PWD 'psxrecomp-post-aa.patch')
+}
+```
+
+Open the workflow link, choose a successful run, and download the artifact matching your platform:
 
 | Platform | Artifact |
 | --- | --- |
@@ -44,13 +64,13 @@ Each successful [Cross-platform build workflow](https://github.com/foofly/Kurush
 | macOS Intel | `kurushi-macos-intel-setup-host` |
 | macOS Apple Silicon | `kurushi-macos-arm64-setup-host` |
 
-Extract the downloaded archive. It contains the runtime executable and its staged configuration, BIOS, assets, and bundled mods. Start it from the extracted folder:
+Extract the downloaded artifact into the root of the cloned project, alongside `game.toml` and the `psxrecomp/` directory. Allow it to merge the included runtime folders. Start the executable from the project root:
 
 - **Linux x64 / ARM64:** run `./Kurushi_Recompiled` in a terminal.
 - **Windows x64:** run `Kurushi_Recompiled.exe`, or in PowerShell use `./Kurushi_Recompiled.exe`.
 - **macOS Intel / Apple Silicon:** in Terminal, run `chmod +x ./Kurushi_Recompiled && ./Kurushi_Recompiled`.
 
-These downloads are **setup host builds**, not playable game builds. They verify that the runtime compiles for each platform, but contain no generated game code or disc image. To build and play the game, generate code from your own USA disc on that platform and follow [Build](#build). The Actions artifacts are temporary CI outputs, not releases.
+In the launcher, use the setup wizard to browse to your legally obtained matching USA disc image (select the `.cue` when you have a CUE/BIN dump), then choose **Generate & rebuild**. The wizard uses the cloned source and generates game code locally, rebuilds the runtime, and relaunches it. Generated code and the disc image stay on your machine. See [Build](#build) for the manual equivalent. CI artifacts are temporary setup hosts, not releases or prebuilt game binaries.
 
 ## Enhancements
 
