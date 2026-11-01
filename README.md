@@ -1,128 +1,49 @@
 # Kurushi Recompiled
 
-<!-- retcomm-readme-metrics -->
-[![GitHub downloads (all assets, all releases)](https://img.shields.io/github/downloads/RetroPortingToolKit/KurushiRecomp/total)](https://github.com/RetroPortingToolKit/KurushiRecomp/releases)
-[![GitHub downloads (latest release)](https://img.shields.io/github/downloads/RetroPortingToolKit/KurushiRecomp/latest/total)](https://github.com/RetroPortingToolKit/KurushiRecomp/releases/latest)
-[![GitHub release](https://img.shields.io/github/v/release/RetroPortingToolKit/KurushiRecomp)](https://github.com/RetroPortingToolKit/KurushiRecomp/releases/latest)
-<!-- /retcomm-readme-metrics -->
+An experimental native build of the USA release of *I.Q: Intelligent Qube*, powered by [PSXRecomp](https://github.com/mstan/psxrecomp).
 
-Static recompilation of **Kurushi** built on
-[psxrecomp](https://github.com/mstan/psxrecomp) and
-[recomp-ui](https://github.com/RetroPortingToolKit/recomp-ui).
+This repository contains project configuration, enhancement code, and build tools. It does **not** include the game disc, extracted executable, generated game code, screenshots, or retail BIOS. You need to provide your own legally obtained disc image. Generated files are derived locally and must not be committed or uploaded.
 
-_Add a short pitch in catalog_identity.json / README._
+## Build
 
-| | |
-|---|---|
-| Players | 1 |
-| Region | USA |
-| Publisher | — |
-| Year | — |
+Initialize the framework submodules and build the code generators:
 
-Scaffolded with the New Project Layout. See
-`psxrecomp/docs/GAME_PROJECT_SETUP.md` for the full flow.
-
-<!-- retcomm-readme-launcher -->
-## Retro Launcher
-
-You can run this title **standalone** (download the release zip, point it at
-your disc, play), or manage installs, updates, and disc/BIOS wiring with
-**[Retro Launcher](https://github.com/RetroPortingToolKit/Retro-Launcher)** —
-the Retro Compilation Manager hub for self-compiling recomps.
-
-[Downloads](https://github.com/RetroPortingToolKit/Retro-Launcher/releases) ·
-[Full README & features](https://github.com/RetroPortingToolKit/Retro-Launcher#readme)
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/RetroPortingToolKit/Retro-Launcher/main/docs/screenshots/hub-and-game-launcher.png" alt="Retro hub with a background build, next to a title’s recomp-ui launcher" width="720">
-</p>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/RetroPortingToolKit/Retro-Launcher/main/docs/screenshots/queue-and-background-build.png" alt="Background cmake build with titles queued" width="720">
-</p>
-
-Retro checks for updates, installs the prebuilt release zips, and automates
-BIOS/ROM/save plumbing so you are not stuck repeating each game’s first run by hand.
-<!-- /retcomm-readme-launcher -->
-
-## Legal
-
-You must own the original game. Disc images under `disc/` are gitignored and
-must never be committed. Retail BIOS dumps are not redistributed and no C
-derived from one may be committed; releases run on the bundled MIT OpenBIOS.
-
-`generated/` (the recompiled game C) **is committed**: releases ship the
-compiled game, built by CI from that tree. Regenerate and commit it whenever
-seeds or the framework pin change.
-
-Default app icon: `assets/psxrecomp.ico` (and `.png` / `.svg`) — Retro-themed controller mark from `psxrecomp/assets/`. Windows builds embed it via `APP_ICON`.
-
-Optional box art under `launcher_assets/img/` may come from
-[libretro-thumbnails](https://github.com/libretro-thumbnails/libretro-thumbnails)
-(`Named_Boxarts`); see `BOXART_SOURCE.txt` when present.
-
-## Quick start (dev)
-
-```bash
+```sh
 git submodule update --init --recursive
-./psxrecomp/tools/ci/build_emitters.sh
+bash psxrecomp/tools/ci/build_emitters.sh
+```
+
+Place the matching USA CUE/BIN files under `disc/`, or keep them elsewhere and pass the CUE path to the generation command:
+
+```sh
 python3 psxrecomp/psxrecomp_cli.py generate \
-  --config game.toml --project-root . --disc disc/<your>.cue
-git add generated && git commit -m "Regenerate game C"
-cmake -S . -B build-release -G Ninja -DCMAKE_BUILD_TYPE=Release
-cmake --build build-release --target psx-runtime
+  --no-toolchain-download \
+  --config game.toml \
+  --project-root . \
+  --disc "/path/to/your/I.Q.cue"
+./tools/build-playtest.sh
 ```
 
-Official optimized Windows/Linux releases use the maintained shared builder
-with the title disc available. Commit the desired `VERSION`, source and
-framework pins, then run:
+The generated game C stays in the ignored `generated/` directory. `build-playtest.sh` also applies the small tracked PSXRecomp API patch required by the anti-aliasing option. Use `./tools/build-playtest.sh --help` for build options.
 
-```bash
-scripts/package_release.sh --channel public
-# Use --channel playtest for a non-public package; --platform selects Windows/Linux.
+For a normal direct launch, run `./play.sh`. Open the launcher with `./play.sh --launcher`. If the game disc is outside `disc/`, pass it explicitly:
+
+```sh
+./play.sh --disc "/path/to/your/I.Q.cue"
 ```
 
-On Windows PowerShell, use
-`psxrecomp/tools/package_title_release.ps1 --channel public`. The generated
-`packaging/release.toml` and player instructions define the title payload.
-The shared builder owns regeneration, qualified build defaults, fresh private
-PGO boot training on supported native toolchains, staging and verification.
-Boot training is a build step, not gameplay qualification or a performance
-claim. See `psxrecomp/docs/RELEASING_A_TITLE.md`.
+## Enhancements
 
-The separate *Release builds* CI workflow (tag `vX.Y.Z` or dispatch) builds
-committed `generated/` C without a disc on Linux, Windows and macOS. It uses
-`scripts/package_prebuilt_release.sh` and attaches compiled-game ZIPs. That
-explicit prebuilt path does not train selective PGO and is not the official
-optimized-release command. The common builder does not add macOS support.
+The launcher Mods page contains optional Fit widescreen, Faster CD loading, Anti-aliasing, and Smooth motion features. Internal Resolution, PGXP Precision, Rewind, and other framework features are available in the same Mods page. Higher resolutions and some visual options require OpenGL. Smooth motion blends presentation frames without changing the game's simulation speed; moving objects can show trails.
 
-Studio's current Export action still uses the old prebuilt argument contract;
-use the shared command above for optimized releases until Studio adopts the
-recipe/channel interface. Its packager detection and `packaging/` warning also
-need that adoption; the generated recipe is maintained configuration, not a
-forked packager.
+## Controls and compatibility
 
-## Symbols
+Player 1 uses the first attached SDL gamepad by default. The game uses a digital pad; D-pad moves, Cross selects/marks/captures, Triangle activates Advantage Zones, Square speeds cube rotation, and Options pauses. The framework launcher provides controller configuration and remapping.
 
-Progressive map: `symbols.toml` → `python3 tools/sync_symbols.py` →
-`psx_symbols.h` (`PSX_FN_*`). See `psxrecomp/docs/SYMBOLS.md`.
+The USA build has been user-played with a PS5 controller. This is an experimental project: full-game completion, complete compatibility, and gameplay parity have not been established. See `docs/compatibility.md` for the current validation scope.
 
-## Framework pins
+## Project boundaries
 
-Submodule gitlinks (`psxrecomp`, optional `recomp-ui`, nested `recomp-net`)
-are authoritative. `framework_pins.txt` is an optional scaffold snapshot;
-release CI logs SHAs with `record_pins.sh` but builds whatever the gitlinks
-resolve to. Bump submodules deliberately — do not float on `main`/`master`
-in release CI.
+Do not commit or distribute disc images, extracted executables, generated game C, memory-card saves, captured gameplay images, or compiled game binaries. Do not add proprietary BIOS files. The included OpenBIOS source/binary is supplied by the framework under its own license. Check licenses and distribution rights for all dependencies and assets before publishing releases.
 
-<!-- retcomm-readme-raid -->
----
-
-<p align="center">
-  <sub><b>R.A.I.D. — Retro AI Development</b> · a Discord for AI-assisted retro reverse-engineering, decomp &amp; recomp</sub>
-</p>
-
-<p align="center">
-  <a href="https://discord.gg/Ad9BwSzctP"><img src=".github/raid-discord.png" alt="Join the Retro AI Development (R.A.I.D.) Discord" width="200"></a>
-</p>
-<!-- /retcomm-readme-raid -->
+Project-authored material is offered under [PolyForm Noncommercial 1.0.0](LICENSE), for noncommercial use. This license applies only to material the project owner has rights to license; it grants no rights to Kurushi, game assets, or third-party components. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for dependency licenses.

@@ -1,0 +1,103 @@
+format_version = 11
+id = "kurushi.qol"
+version = "0.1.0"
+name = "Kurushi Quality of Life"
+author = "KurushiRecomp"
+description = "Optional USA-revision convenience features."
+resolver = "declarative"
+save_compatibility = "isolated"
+
+[[target]]
+game_id = "SCUS-94181"
+disc_sha256 = "a89b811e9f0442504c577026346d0e176de346f692b5f5a7e9ea168fe5bfd9fc"
+
+[[feature]]
+id = "fit-widescreen"
+name = "Fit widescreen"
+description = "Adapt the game view to the window from 16:9 through 21:9. Experimental: some objects may remain culled at the original camera edges."
+group = "Display"
+default_enabled = false
+quick = true
+
+[[plugin]]
+feature = "fit-widescreen"
+id = "kurushi.widescreen.fit21"
+
+[[feature]]
+id = "faster-cd-loading"
+name = "Faster CD loading (2×)"
+description = "Shortens emulated CD read waits to 2× while keeping game speed normal. Experimental; disable if a load stalls or behaves incorrectly."
+group = "Quality of Life"
+default_enabled = false
+quick = true
+
+[[plugin]]
+feature = "faster-cd-loading"
+id = "kurushi.loading.cd2x"
+
+[[feature]]
+id = "anti-aliasing"
+name = "Anti-aliasing"
+description = "Apply OpenGL post-process edge smoothing to the game image and HUD."
+group = "Display"
+default_enabled = false
+quick = true
+
+[[option]]
+feature = "anti-aliasing"
+id = "mode"
+label = "Anti-aliasing mode"
+description = "FXAA smooths edges; FXAA high quality searches farther along edges. Off keeps the original sharp image."
+group = "Display"
+type = "choice"
+default = "fxaa"
+
+[[option.choice]]
+value = "off"
+label = "Off"
+
+[[option.choice]]
+value = "fxaa"
+label = "FXAA"
+
+[[option.choice]]
+value = "fxaa_hq"
+label = "FXAA high quality"
+
+[[plugin]]
+feature = "anti-aliasing"
+id = "kurushi.visual.anti-aliasing"
+
+[[feature]]
+id = "smooth-motion"
+name = "Smooth motion"
+description = "Present interpolated frames at a higher refresh rate while game logic and audio stay at the original speed. OpenGL only; moving objects may show blending trails."
+group = "Display"
+default_enabled = false
+quick = true
+vsync = "off"
+
+[[option]]
+feature = "smooth-motion"
+id = "output-rate"
+label = "Output rate"
+description = "Display refresh follows the monitor; fixed rates choose 60 or 120 Hz."
+group = "Display"
+type = "choice"
+default = "display"
+
+[[option.choice]]
+value = "display"
+label = "Display refresh"
+
+[[option.choice]]
+value = "60"
+label = "60 Hz"
+
+[[option.choice]]
+value = "120"
+label = "120 Hz"
+
+[[plugin]]
+feature = "smooth-motion"
+id = "kurushi.presentation.smooth-motion"

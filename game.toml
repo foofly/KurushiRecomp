@@ -6,7 +6,7 @@ name = "Kurushi"
 id = "SCUS-94181"
 players = 1
 exe = "disc/SCUS_941.81"
-disc = "/var/home/bill/git/IQ/I.Q - Intelligent Qube (USA)/I.Q - Intelligent Qube (USA).cue"
+disc = "disc/I.Q - Intelligent Qube (USA).cue"
 load_address = "0x80010000"
 entry_pc = "0x8003A838"
 text_size = "0x0005C800"
@@ -39,15 +39,26 @@ window_title = "Kurushi Recompiled"
 memcard_dir = "saves"
 overlay_cache = true
 
+[launcher]
+quick_controls = true
+
 [video]
 renderer = "opengl"
 aspect_ratio = "4:3"
 
+# Widescreen is only activated by the optional Fit widescreen mod. This title
+# is a 3D game without sprite-tag hooks, so use its GTE projection activity to
+# distinguish gameplay frames from 2D menus and the BIOS boot.
+[widescreen]
+gte_game_mode = true
+
 [controller]
+p1_device = "gamepad"
 default_mode = "digital"
 
 # Online mount gate: digests + track count + optional TOC fingerprint
 # (see docs/NETPLAY.md).
+multitap_analog = true
 [netplay]
 require_cue = true
 required_tracks = 1

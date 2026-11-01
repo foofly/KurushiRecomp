@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Official optimized Windows/Linux release command. Requires the title disc.
+# Local packaging helper. Requires the user's disc and creates binaries that
+# contain game-derived code. Do not upload its artifacts without separate
+# authorization and distribution review.
 # Build, private boot training, staging and verification belong to the shared
 # builder; --channel public|playtest is required and has no default.
 # Usage: scripts/package_release.sh --channel public [--platform windows|linux|all]

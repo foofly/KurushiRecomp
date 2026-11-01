@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-# Explicit prebuilt-only wrapper for committed-C, no-disc CI (including macOS).
-# It does not run selective PGO training. Official optimized Windows/Linux
-# releases use package_release.sh and the maintained shared release builder.
+# Local packaging helper. It expects an executable built locally from game
+# sources generated from the user's disc. Do not run this in CI or upload its
+# output: the compiled game contains material derived from the original game.
 # Autofilled by tools/new_project_layout/setup_project.{sh,ps1}.
 #
-# Ships the COMPILED game built from this repo's committed generated/ C:
-# executable, runtime data, bundled OpenBIOS, mod catalog, overlay toolchain.
-# No sources, emitters, CLI, generated C, or BIOS dumps.
+# Packages the local executable, runtime data, bundled OpenBIOS, mod catalog,
+# and overlay toolchain. No game source or disc data is copied by this script.
 #
 # Usage:
 #   scripts/package_prebuilt_release.sh <build-dir> <artifact-tag> [recompiler-build-dir]
@@ -32,16 +31,14 @@ fi
 chmod +x "${PACKAGER}" 2>/dev/null || true
 
 EXTRA=()
-# Overlay shard cache. It is compiled FROM THE DISC, so CI (no disc) cannot
-# build one: the committed static AOT shard is linked into the executable and
-# the bundled overlay_toolchain/ compiles the rest from the player's disc at
-# runtime. A developer packaging locally with a cache can ship it instead:
+# Overlay shard cache. It is compiled from the disc and remains local. A
+# developer may supply it for local experiments:
 #   PSX_OVERLAY_CACHE_ROOT=/path/to/cache scripts/package_prebuilt_release.sh ...
 if [[ -n "${PSX_OVERLAY_CACHE_ROOT:-}" ]]; then
   EXTRA+=(--overlay-cache-root "${PSX_OVERLAY_CACHE_ROOT}")
 else
   EXTRA+=(--ship-without-overlay-cache-because \
-    "no disc at package time: the committed static AOT shard is compiled in and overlay_toolchain/ autocompiles the rest on the player's machine")
+    "no local overlay cache supplied; the runtime compiles needed overlays from the user's disc")
 fi
 # Extra docs shipped at the zip root (DISC.md tells players which dump works).
 for _doc in DISC.md; do

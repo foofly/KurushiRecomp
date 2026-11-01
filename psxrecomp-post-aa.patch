@@ -1,0 +1,25 @@
+diff --git a/runtime/include/mod_plugins.h b/runtime/include/mod_plugins.h
+--- a/runtime/include/mod_plugins.h
++++ b/runtime/include/mod_plugins.h
+@@ -1097,1 +1097,6 @@
++/* Set OpenGL post-process anti-aliasing for this mod session: 0=off,
++ * 1=FXAA, 2=FXAA high quality. The selected value is applied when the
++ * renderer initializes; software rendering ignores it. */
++int psx_mod_set_post_aa(uint32_t mode);
++
+ /*
+diff --git a/runtime/src/main.cpp b/runtime/src/main.cpp
+--- a/runtime/src/main.cpp
++++ b/runtime/src/main.cpp
+@@ -2119,1 +2119,11 @@
++extern "C" int psx_mod_set_post_aa(uint32_t mode) {
++    if (mode > GL_POST_AA_FXAA_HQ) {
++        std::fprintf(stderr, "psxrecomp: mod rejected post-AA mode %u\n",
++                     (unsigned)mode);
++        return 0;
++    }
++    g_video_post_aa = (int)mode;
++    return 1;
++}
++
+ extern "C" int psx_mod_set_controller_mode_override(

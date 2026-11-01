@@ -12,10 +12,9 @@ endif()
 project(KurushiRecomp LANGUAGES C CXX)
 
 # --- Opt-in product surfaces (OFF by default in the framework) -------------
-# Scaffold prompts / flags fill these. Without recomp-ui, PSX_RECOMP_UI is OFF.
-# The wizard (WIZARD_CMAKE_BLOCK / ENABLE_SETUP_WIZARD) is the first-run disc
-# picker; releases are compiled from the committed generated/ C, so it never
-# needs to generate or rebuild anything on a player's machine.
+# Without recomp-ui, PSX_RECOMP_UI is OFF. The local generated/ C is derived
+# from the user's disc and is intentionally not committed. Generate it before
+# configuring this runtime; see README.md.
 # recomp-ui submodule present (PSX_RECOMP_UI defaults ON).
 # Full netplay UI — enable after adding recomp-ui + testing:
 # if(EXISTS "${PSXRECOMP_ROOT}/lib/recomp-net/CMakeLists.txt")
@@ -47,12 +46,16 @@ psxrecomp_add_game_runtime(psx-runtime
     MAX_PLAYERS 1
     # LAUNCHER_BOXART "${CMAKE_CURRENT_SOURCE_DIR}/launcher_assets/img/boxart.tga"
     APP_ICON "${CMAKE_CURRENT_SOURCE_DIR}/assets/psxrecomp.ico"
-    # Committed game C (psxrecomp_cli.py generate; git add generated). Release
-    # CI configures with -DPSXRECOMP_REQUIRE_GAME_C=ON so a checkout without
-    # it fails instead of building a setup host.
+    # Local-only game C generated from the user's disc.
     GEN_MARKER "generated/SCUS_941.81_dispatch.c"
     GEN_FULL_GLOB "generated/SCUS_941.81_full_*.c"
     CODEGEN_SETUP_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/codegen_setup.c"
+)
+
+# The widescreen option is a trusted, statically linked mod plugin. Keeping it
+# in the title runtime lets the Mods page select adaptive 16:9..21:9 output.
+target_sources(psx-runtime PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/mods/kurushi_widescreen.c"
 )
 
 # Stage runtime configs next to the exe for direct build/ launches. Only copy

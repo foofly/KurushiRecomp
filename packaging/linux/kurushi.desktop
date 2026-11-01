@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Kurushi
+Exec=Kurushi_Recompiled
+Icon=kurushi
+Categories=Game;
+Terminal=false
