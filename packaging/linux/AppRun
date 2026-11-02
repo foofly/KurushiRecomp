@@ -64,13 +64,17 @@ if [ -d "$payload/cache" ]; then
     chmod -R u+rwX "$data_dir/cache"
 fi
 
-# Link the read-only bundled overlay toolchain into the writable data directory.
-# The runtime looks beside argv[0], and argv[0] is the launcher symlink below.
-if [ -d "$payload/overlay_toolchain" ]; then
-    if [ -L "$data_dir/overlay_toolchain" ] || [ ! -e "$data_dir/overlay_toolchain" ]; then
-        ln -sfn "$payload/overlay_toolchain" "$data_dir/overlay_toolchain"
+# Link read-only bundled toolchains into the writable data directory. The
+# runtime and setup wizard look beside argv[0], which is the launcher symlink
+# below. Repoint stale AppImage mount links on each launch; preserve real user
+# directories if one already exists.
+for tree in toolchain overlay_toolchain; do
+    if [ -d "$payload/$tree" ]; then
+        if [ -L "$data_dir/$tree" ] || [ ! -e "$data_dir/$tree" ]; then
+            ln -sfn "$payload/$tree" "$data_dir/$tree"
+        fi
     fi
-fi
+done
 for file in game.toml game_options.toml LICENSE README.md START_HERE.txt AOT_CACHE_AUDIT.json VERSION RELEASE_NOTES.md RELEASE_MANIFEST.json; do
     if [ -f "$payload/$file" ]; then
         cp -f "$payload/$file" "$data_dir/$file"

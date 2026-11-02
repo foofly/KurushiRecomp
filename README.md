@@ -6,27 +6,29 @@ The project provides a launcher and a setup package. You supply your own game di
 
 ## Play
 
-Download the ZIP for your platform from the [v0.1.2 release](https://github.com/foofly/KurushiRecomp/releases/tag/v0.1.2). Future versions will be listed on the [Releases page](https://github.com/foofly/KurushiRecomp/releases).
+Download the ZIP for your platform from the [latest release](https://github.com/foofly/KurushiRecomp/releases/latest). Linux x64 users can also download the AppImage.
 
 | Platform | Artifact |
 | --- | --- |
-| Linux x64 | `kurushi-0.1.2-linux-x64.zip` |
-| Linux ARM64 | `kurushi-0.1.2-linux-arm64.zip` |
-| Windows x64 | `kurushi-0.1.2-windows-x64.zip` |
-| macOS Intel | `kurushi-0.1.2-macos-intel.zip` |
-| macOS Apple Silicon | `kurushi-0.1.2-macos-arm64.zip` |
+| Linux x64 | `kurushi-<version>-linux-x86_64.AppImage` or `kurushi-<version>-linux-x64.zip` |
+| Linux ARM64 | `kurushi-<version>-linux-arm64.zip` |
+| Windows x64 | `kurushi-<version>-windows-x64.zip` |
+| macOS Intel | `kurushi-<version>-macos-intel.zip` |
+| macOS Apple Silicon | `kurushi-<version>-macos-arm64.zip` |
 
-Download `SHA256SUMS` from the same release if you want to verify the ZIP. On Linux or macOS, put it beside the downloaded ZIP and run `sha256sum -c SHA256SUMS`. On Windows, compare the output of `Get-FileHash .\kurushi-0.1.2-windows-x64.zip -Algorithm SHA256` with the Windows entry in `SHA256SUMS`.
+Download `SHA256SUMS` from the same release if you want to verify a download. On Linux or macOS, put it beside the file and run `sha256sum -c SHA256SUMS`. On Windows, compare the output of `Get-FileHash .\kurushi-<version>-windows-x64.zip -Algorithm SHA256` with its entry in `SHA256SUMS`.
 
-Extract the ZIP and run `Kurushi_Recompiled` (`Kurushi_Recompiled.exe` on Windows). On macOS, run `chmod +x ./Kurushi_Recompiled` first if needed.
+For a Linux AppImage, run `chmod +x ./kurushi-<version>-linux-x86_64.AppImage` once, then launch it. The AppImage bundles Linux runtime libraries and stores settings, saves, and generated files in your user data directory. The Linux x64 ZIP is an alternative if you prefer an extracted folder. For other platforms, extract the ZIP and run `Kurushi_Recompiled` (`Kurushi_Recompiled.exe` on Windows). On macOS, run `chmod +x ./Kurushi_Recompiled` first if needed.
 
 On first launch, the setup screen asks for your legally obtained USA disc image. For a CUE/BIN dump, choose the `.cue` file. Choose **Generate & rebuild** to create the playable game on your computer. Windows, Linux x64, and macOS releases include their platform build tools, so the launcher does not need to download a toolchain. macOS still requires Apple’s Command Line Tools (`xcode-select --install` in Terminal). Linux ARM64 has no published portable toolchain pack and requires CMake, Ninja, Python 3, and C/C++ compilers from the system package manager. When the build finishes, the launcher opens the game and remembers the disc path. Use **Load Disc Image** in the launcher to choose or change the image for a later launch.
+
+Linux x64 releases are built against Ubuntu 22.04 system libraries to improve compatibility with SteamOS and older distributions. The AppImage bundles additional runtime libraries; it does not bundle a Linux kernel or graphics driver. Steam Deck use has not yet been verified.
 
 The v0.1.0 and v0.1.1 downloads do not include the build tools. Use v0.1.2 or newer for bundled tools on Windows, Linux x64, and macOS.
 
 The setup package includes the project source, PSXRecomp tools, launcher, and platform build toolchain where available; it does not include game data. Bundled toolchain components retain their upstream licenses and notices under `toolchain/`. The Linux x64 ZIP is larger because it includes the compiler and dependencies. Linux ARM64 users need to install the listed build tools themselves.
 
-Each versioned `vX.Y.Z` tag builds and publishes all five platform ZIPs together. For in-progress builds, see the [Actions workflow](https://github.com/foofly/KurushiRecomp/actions/workflows/cross-platform-build.yml); those artifacts expire after 14 days.
+Each versioned `vX.Y.Z` tag builds and publishes all five platform ZIPs together, plus the Linux x64 AppImage. For in-progress builds, see the [Actions workflow](https://github.com/foofly/KurushiRecomp/actions/workflows/cross-platform-build.yml); those artifacts expire after 14 days.
 
 ## Controls
 

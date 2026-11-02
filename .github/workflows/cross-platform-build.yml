@@ -19,7 +19,8 @@ jobs:
       matrix:
         include:
           - name: Linux x64
-            runner: ubuntu-24.04
+            # Keep the glibc baseline compatible with SteamOS and older distros.
+            runner: ubuntu-22.04
             artifact: linux-x64
             toolchain_artifact: linux-x64
           - name: Linux ARM64
@@ -98,6 +99,13 @@ jobs:
           script.write_text(source)
           PY
 
+      - name: Allow setup-host AppImage without game execution manifest
+        if: matrix.artifact == 'linux-x64'
+        shell: bash
+        run: |
+          git -C psxrecomp apply --check "$GITHUB_WORKSPACE/psxrecomp-appimage-setup-host.patch"
+          git -C psxrecomp apply "$GITHUB_WORKSPACE/psxrecomp-appimage-setup-host.patch"
+
       - name: Check release tag matches project version
         if: startsWith(github.ref, 'refs/tags/v')
         shell: bash
@@ -155,11 +163,24 @@ jobs:
             --project-file THIRD_PARTY_NOTICES.md \
             ${{ matrix.toolchain_artifact != 'none' && '--embed-toolchain' || '--no-embed-toolchain' }}
 
+      - name: Package Linux AppImage
+        if: matrix.artifact == 'linux-x64'
+        run: bash scripts/package_appimage.sh
+
       - name: Upload platform setup package
         uses: actions/upload-artifact@v4
         with:
           name: kurushi-${{ matrix.artifact }}-setup-package
           path: dist/kurushi-*-${{ matrix.artifact }}.zip
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Linux AppImage
+        if: matrix.artifact == 'linux-x64'
+        uses: actions/upload-artifact@v4
+        with:
+          name: kurushi-linux-x86_64-appimage
+          path: dist/kurushi-*-linux-x86_64.AppImage
           if-no-files-found: error
           retention-days: 14
 
@@ -178,6 +199,12 @@ jobs:
           path: release-assets
           merge-multiple: true
 
+      - name: Download Linux AppImage
+        uses: actions/download-artifact@v4
+        with:
+          name: kurushi-linux-x86_64-appimage
+          path: release-assets
+
       - name: Verify packages and create checksums
         shell: bash
         run: |
@@ -188,7 +215,13 @@ jobs:
             ls -la release-assets >&2
             exit 1
           fi
-          (cd release-assets && sha256sum kurushi-*.zip > SHA256SUMS)
+          appimages=(release-assets/kurushi-*-linux-x86_64.AppImage)
+          if [[ "${#appimages[@]}" -ne 1 ]]; then
+            echo "Expected one Linux x86_64 AppImage, found ${#appimages[@]}" >&2
+            ls -la release-assets >&2
+            exit 1
+          fi
+          (cd release-assets && sha256sum kurushi-*.zip kurushi-*-linux-x86_64.AppImage > SHA256SUMS)
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
@@ -198,4 +231,5 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             release-assets/kurushi-*.zip
+            release-assets/kurushi-*-linux-x86_64.AppImage
             release-assets/SHA256SUMS

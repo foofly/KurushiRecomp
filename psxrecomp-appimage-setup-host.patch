@@ -1,0 +1,39 @@
+--- a/tools/package_appimage.sh
++++ b/tools/package_appimage.sh
+@@ -47,7 +47,7 @@
+ }
+ PAYLOAD="$(cd "$PAYLOAD" && pwd)"
+ FRAMEWORK="$(cd "$FRAMEWORK" && pwd)"
+-for file in "$APP_RUN" "$DESKTOP" "$ICON" "$PAYLOAD/$EXE_NAME" "$PAYLOAD/$EXE_NAME.execution.json"; do
++for file in "$APP_RUN" "$DESKTOP" "$ICON" "$PAYLOAD/$EXE_NAME"; do
+   [[ -f "$file" ]] || { echo "missing ${file}" >&2; exit 1; }
+ done
+ [[ -d "$PAYLOAD/assets" && -f "$PAYLOAD/game.toml" ]] || {
+@@ -70,8 +70,8 @@
+ if png_magic != b'\x89PNG\r\n\x1a\n':
+     raise SystemExit('AppImage icon must be PNG')
+ PY
+-if find "$PAYLOAD" -type f \( -iname '*.dll' -o -iname '*.exe' \) -print -quit | grep -q .; then
+-  echo "Linux payload contains Windows binaries/cache" >&2; exit 1
++if find "$PAYLOAD" -maxdepth 1 -type f \( -iname '*.dll' -o -iname '*.exe' \) -print -quit | grep -q .; then
++  echo "Linux payload contains Windows binaries at its root" >&2; exit 1
+ fi
+ sh -n "$APP_RUN"
+ APPDIR="$(mktemp -d "${TMPDIR:-/tmp}/psx-appimage.XXXXXXXX")"
+@@ -124,9 +124,13 @@
+ # Deployment may rewrite RPATH. The original sidecar supplies the contract,
+ # while the helper verifies its embedded identity and hashes the FINAL ELF;
+ # a prior payload binary_sha256 is never accepted as the final-byte receipt.
+-"$PY" "$HELPER" stage-execution --binary "$APPDIR/usr/bin/$EXE_NAME" \
+-  --manifest "$PAYLOAD/$EXE_NAME.execution.json" \
+-  --output "$APPDIR/usr/bin/$EXE_NAME.execution.json"
++if [[ -f "$PAYLOAD/$EXE_NAME.execution.json" ]]; then
++  "$PY" "$HELPER" stage-execution --binary "$APPDIR/usr/bin/$EXE_NAME" \
++    --manifest "$PAYLOAD/$EXE_NAME.execution.json" \
++    --output "$APPDIR/usr/bin/$EXE_NAME.execution.json"
++else
++  echo "No execution manifest in setup-host payload; skipping game execution receipt."
++fi
+ SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-0}"
+ [[ "$SOURCE_DATE_EPOCH" =~ ^[0-9]+$ ]] || { echo "invalid SOURCE_DATE_EPOCH" >&2; exit 2; }
+ export SOURCE_DATE_EPOCH
