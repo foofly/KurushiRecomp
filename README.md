@@ -6,23 +6,51 @@ The project provides a launcher and a setup package. You supply your own game di
 
 ## Play
 
-Download the ZIP for your platform from the [latest release](https://github.com/foofly/KurushiRecomp/releases/latest). Linux x64 users can also download the AppImage.
+Download the matching asset from the [v0.1.4 release](https://github.com/foofly/KurushiRecomp/releases/tag/v0.1.4). Future versions are listed on the [Releases page](https://github.com/foofly/KurushiRecomp/releases).
 
-| Platform | Artifact |
+| Platform | v0.1.4 download |
 | --- | --- |
-| Linux x64 | `kurushi-<version>-linux-x86_64.AppImage` or `kurushi-<version>-linux-x64.zip` |
-| Linux ARM64 | `kurushi-<version>-linux-arm64.zip` |
-| Windows x64 | `kurushi-<version>-windows-x64.zip` |
-| macOS Intel | `kurushi-<version>-macos-intel.zip` |
-| macOS Apple Silicon | `kurushi-<version>-macos-arm64.zip` |
+| Linux x64 | `kurushi-0.1.4-linux-x86_64.AppImage` (recommended) or `kurushi-0.1.4-linux-x64.zip` |
+| Linux ARM64 | `kurushi-0.1.4-linux-arm64.zip` |
+| Windows x64 | `kurushi-0.1.4-windows-x64.zip` |
+| macOS Intel | `kurushi-0.1.4-macos-intel.zip` |
+| macOS Apple Silicon | `kurushi-0.1.4-macos-arm64.zip` |
 
-Download `SHA256SUMS` from the same release if you want to verify a download. On Linux or macOS, put it beside the file and run `sha256sum -c SHA256SUMS`. On Windows, compare the output of `Get-FileHash .\kurushi-<version>-windows-x64.zip -Algorithm SHA256` with its entry in `SHA256SUMS`.
+To verify a download, also download `SHA256SUMS` from the release. On Linux, compare `sha256sum <filename>` with the matching entry. On macOS, compare `shasum -a 256 <filename>`. On Windows PowerShell, compare `(Get-FileHash .\<filename> -Algorithm SHA256).Hash` with the matching entry in `SHA256SUMS`.
 
-For a Linux AppImage, run `chmod +x ./kurushi-<version>-linux-x86_64.AppImage` once, then launch it. The AppImage bundles Linux runtime libraries and stores settings, saves, and generated files in your user data directory. The Linux x64 ZIP is an alternative if you prefer an extracted folder. For other platforms, extract the ZIP and run `Kurushi_Recompiled` (`Kurushi_Recompiled.exe` on Windows). On macOS, run `chmod +x ./Kurushi_Recompiled` first if needed.
+### Linux x64 AppImage
 
-On first launch, the setup screen asks for your legally obtained USA disc image. For a CUE/BIN dump, choose the `.cue` file. Choose **Generate & rebuild** to create the playable game on your computer. Windows, Linux x64, and macOS releases include their platform build tools, so the launcher does not need to download a toolchain. macOS still requires Apple’s Command Line Tools (`xcode-select --install` in Terminal). Linux ARM64 has no published portable toolchain pack and requires CMake, Ninja, Python 3, and C/C++ compilers from the system package manager. When the build finishes, the launcher opens the game and remembers the disc path. Use **Load Disc Image** in the launcher to choose or change the image for a later launch.
+Make the AppImage executable once, then launch it:
 
-Linux x64 releases are built against Ubuntu 22.04 system libraries to improve compatibility with SteamOS and older distributions. The AppImage bundles additional runtime libraries; it does not bundle a Linux kernel or graphics driver. Steam Deck use has not yet been verified.
+```sh
+chmod +x ./kurushi-0.1.4-linux-x86_64.AppImage
+./kurushi-0.1.4-linux-x86_64.AppImage
+```
+
+The AppImage includes the launcher, build tools, and Linux runtime libraries. It does not include a Linux kernel or graphics driver. Settings, saves, and generated game files are stored in your user data directory. On Steam Deck, use Desktop Mode to try it; Steam Deck compatibility has not yet been verified. The AppImage is x86_64 only.
+
+### Linux ZIP
+
+Extract `kurushi-0.1.4-linux-x64.zip`, then run `./Kurushi_Recompiled` from the extracted directory. The Linux x64 build uses Ubuntu 22.04 system libraries for compatibility with older Linux distributions. The ZIP includes the build toolchain. Linux ARM64 users should extract `kurushi-0.1.4-linux-arm64.zip` and run `./Kurushi_Recompiled`; that build requires CMake, Ninja, Python 3, and a C/C++ compiler installed from the system package manager.
+
+### Windows x64
+
+Extract `kurushi-0.1.4-windows-x64.zip` and double-click `Kurushi_Recompiled.exe`. The ZIP includes the Windows build tools.
+
+### macOS
+
+Extract the ZIP for your Mac: use `kurushi-0.1.4-macos-intel.zip` for an Intel Mac or `kurushi-0.1.4-macos-arm64.zip` for Apple Silicon. In Terminal, change to the extracted folder and run:
+
+```sh
+chmod +x ./Kurushi_Recompiled
+./Kurushi_Recompiled
+```
+
+Both macOS builds include the portable build tools, but still require Apple’s Command Line Tools. If needed, install them with `xcode-select --install` in Terminal.
+
+### First launch
+
+The setup screen asks for your legally obtained USA disc image. For a CUE/BIN dump, select the `.cue` file. Choose **Generate & rebuild** to create the playable game on your computer. When the build finishes, the launcher opens the game and remembers the disc path. Use **Load Disc Image** in the launcher to choose or change the image later.
 
 The v0.1.0 and v0.1.1 downloads do not include the build tools. Use v0.1.2 or newer for bundled tools on Windows, Linux x64, and macOS.
 

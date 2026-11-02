@@ -41,13 +41,30 @@ mkdir -p "$data_dir" "$data_dir/saves" "$data_dir/cache" "$data_dir/mods"
 # Release-owned resources: refreshed every launch so an AppImage update can
 # repair or extend its bundled catalog without touching user settings, memory
 # cards, installed third-party mods, or generated cache data.
-for tree in assets bios licenses docs; do
+for tree in assets licenses docs; do
     if [ -d "$payload/$tree" ]; then
         mkdir -p "$data_dir/$tree"
         cp -a "$payload/$tree/." "$data_dir/$tree/"
         chmod -R u+rwX "$data_dir/$tree"
     fi
 done
+# The setup package keeps its redistributable OpenBIOS under psxrecomp/bios,
+# while the runtime looks for bios/openbios.bin beside its launcher. Seed that
+# runtime location so the first launch and generated build can resolve it.
+if [ -d "$payload/bios" ]; then
+    mkdir -p "$data_dir/bios"
+    cp -a "$payload/bios/." "$data_dir/bios/"
+elif [ -d "$payload/psxrecomp/bios" ]; then
+    mkdir -p "$data_dir/bios"
+    for file in openbios.bin OpenBIOS.toml OpenBIOS.LICENSE; do
+        if [ -f "$payload/psxrecomp/bios/$file" ]; then
+            cp -f "$payload/psxrecomp/bios/$file" "$data_dir/bios/$file"
+        fi
+    done
+fi
+if [ -d "$data_dir/bios" ]; then
+    chmod -R u+rwX "$data_dir/bios"
+fi
 if [ -d "$payload/mods" ]; then
     cp -a "$payload/mods/." "$data_dir/mods/"
     chmod -R u+rwX "$data_dir/mods"
