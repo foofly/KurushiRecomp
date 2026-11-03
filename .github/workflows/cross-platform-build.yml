@@ -153,6 +153,8 @@ jobs:
             --disc-hint "your legally obtained USA I.Q. disc image" \
             --project-dir assets \
             --project-dir seeds \
+            --project-dir mods/preloaded \
+            --project-file mods/kurushi_widescreen.c \
             --project-file CMakeLists.txt \
             --project-file game.toml \
             --project-file VERSION \
@@ -162,6 +164,10 @@ jobs:
             --project-file LICENSE \
             --project-file THIRD_PARTY_NOTICES.md \
             ${{ matrix.toolchain_artifact != 'none' && '--embed-toolchain' || '--no-embed-toolchain' }}
+
+      - name: Check AppImage setup layout
+        if: matrix.artifact == 'linux-x64'
+        run: python3 tools/test_appimage_layout.py
 
       - name: Package Linux AppImage
         if: matrix.artifact == 'linux-x64'

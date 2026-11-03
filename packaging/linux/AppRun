@@ -37,6 +37,7 @@ if [ ! -x "$runtime" ] || [ ! -f "$payload/game.toml" ]; then
 fi
 
 mkdir -p "$data_dir" "$data_dir/saves" "$data_dir/cache" "$data_dir/mods"
+data_dir=$(cd "$data_dir" && pwd)
 
 # Release-owned resources: refreshed every launch so an AppImage update can
 # repair or extend its bundled catalog without touching user settings, memory
@@ -98,6 +99,31 @@ for file in game.toml game_options.toml LICENSE README.md START_HERE.txt AOT_CAC
         chmod u+rw "$data_dir/$file"
     fi
 done
+
+# Setup-host releases must expose the complete build project in writable
+# storage. Without the CLI beside game.toml the codegen host cannot discover
+# the project, hides Generate & rebuild, and Play reaches the game entry with
+# no compiled game code. BIOS generation also writes psxrecomp/generated/;
+# these SDK trees must be copies, not links into the read-only AppImage.
+if [ -f "$payload/CMakeLists.txt" ]; then
+    for tree in psxrecomp recomp-ui seeds; do
+        if [ ! -d "$payload/$tree" ]; then
+            echo "@APP_NAME@: setup payload is missing $tree." >&2
+            exit 1
+        fi
+        mkdir -p "$data_dir/$tree"
+        cp -a "$payload/$tree/." "$data_dir/$tree/"
+        chmod -R u+rwX "$data_dir/$tree"
+    done
+    for file in CMakeLists.txt codegen_setup.c codegen_setup.h THIRD_PARTY_NOTICES.md; do
+        if [ -f "$payload/$file" ]; then
+            cp -f "$payload/$file" "$data_dir/$file"
+            chmod u+rw "$data_dir/$file"
+        fi
+    done
+    export KURUSHIRECOMP_PROJECT_ROOT="$data_dir"
+    export KURUSHIRECOMP_BUILD_DIR="$data_dir/build-release"
+fi
 
 # input.ini and keybinds.ini become user-owned after first launch.
 if [ ! -f "$data_dir/input.ini" ] && [ -f "$payload/input.ini" ]; then
