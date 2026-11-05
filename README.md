@@ -4,6 +4,14 @@ An experimental native recompile of the USA release of *I.Q: Intelligent Qube*, 
 
 The project provides a launcher and a setup package. You supply your own game disc image; the launcher generates and builds the game locally. Disc images, retail BIOS files, and generated game code are not included.
 
+## AI usage disclosure
+
+This project has been developed with substantial assistance from AI tools, including OpenAI Codex. AI has been used to write and modify code, build and packaging scripts, documentation, and GitHub workflows, and to help investigate bugs and run tests.
+
+The maintainer directs the work and takes responsibility for the published project. AI-generated changes can contain mistakes, and successful builds and automated tests do not establish full game compatibility. See [Compatibility](#compatibility) for the current testing limits.
+
+This disclosure covers development work in this repository. Game-code generation during setup is performed by PSXRecomp using the disc image you supply.
+
 ## Play
 
 Download the matching asset from the [v0.1.6 release](https://github.com/foofly/KurushiRecomp/releases/tag/v0.1.6). Future versions are listed on the [Releases page](https://github.com/foofly/KurushiRecomp/releases).
