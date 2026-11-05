@@ -1,0 +1,82 @@
+diff --git a/src/common/launcher_platform_sdl3.c b/src/common/launcher_platform_sdl3.c
+--- a/src/common/launcher_platform_sdl3.c
++++ b/src/common/launcher_platform_sdl3.c
+@@ -166,9 +166,6 @@
+                 SDL_VERSIONNUM_MICRO(version), SDL_GetRevision());
+     }
+ 
+-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
+ 
+@@ -186,19 +183,30 @@
+     int win_h = logical_h;
+     fit_initial_window_to_display(&win_w, &win_h);
+ 
+-    p->window = SDL_CreateWindow(title ? title : "Launcher",
+-                                 win_w, win_h, flags);
+-    if (!p->window) {
+-        fprintf(stderr, "[launcher] SDL_CreateWindow failed: %s\n", SDL_GetError());
+-        if (s_quit_sdl) SDL_Quit();
+-        return false;
+-    }
+-
+-    p->gl = SDL_GL_CreateContext(p->window);
++    int attempts = 1;
++#if defined(__linux__)
++    // Pi 4/5 drivers expose desktop GL 3.1. The launcher only needs GL 3.0;
++    // retry without a core-profile request (profiles were added in GL 3.2).
++    attempts = 2;
++#endif
++    for (int attempt = 0; attempt < attempts; ++attempt) {
++        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
++        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, attempt == 0 ? 3 : 0);
++        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
++                            attempt == 0 ? SDL_GL_CONTEXT_PROFILE_CORE : 0);
++        p->window = SDL_CreateWindow(title ? title : "Launcher", win_w, win_h, flags);
++        if (p->window) p->gl = SDL_GL_CreateContext(p->window);
++        if (p->gl) {
++            if (attempt != 0)
++                fprintf(stderr, "[launcher] using OpenGL 3.0 fallback context\n");
++            break;
++        }
++        fprintf(stderr, "[launcher] OpenGL 3.%d window/context failed: %s\n",
++                attempt == 0 ? 3 : 0, SDL_GetError());
++        if (p->window) SDL_DestroyWindow(p->window);
++        p->window = NULL;
++    }
+     if (!p->gl) {
+-        fprintf(stderr, "[launcher] SDL_GL_CreateContext failed: %s\n", SDL_GetError());
+-        SDL_DestroyWindow(p->window);
+-        p->window = NULL;
+         if (s_quit_sdl) SDL_Quit();
+         return false;
+     }
+diff --git a/src/common/backends/imgui/launcher_imgui.cpp b/src/common/backends/imgui/launcher_imgui.cpp
+--- a/src/common/backends/imgui/launcher_imgui.cpp
++++ b/src/common/backends/imgui/launcher_imgui.cpp
+@@ -14906,7 +14906,9 @@
+ #ifdef LNG_GLES2
+     ImGui_ImplOpenGL3_Init("#version 100");   // GLES 2 GLSL (host ANGLE backend)
+ #else
+-    ImGui_ImplOpenGL3_Init("#version 330");
++    // Backend defaults select GLSL 130 on Linux and 150 on macOS,
++    // supporting the GL 3.0 launcher fallback as well as newer contexts.
++    ImGui_ImplOpenGL3_Init(nullptr);
+ #endif
+     launcher_boot_timing_mark("rui:imgui_gl_ready");
+ 
+diff --git a/src/common/launcher_platform.h b/src/common/launcher_platform.h
+--- a/src/common/launcher_platform.h
++++ b/src/common/launcher_platform.h
+@@ -52,7 +52,7 @@
+     bool  should_quit;     // window close requested
+ } LauncherPlatform;
+ 
+-// Create the window (RESIZABLE + HIGH_PIXEL_DENSITY) and a GL 3.3 core context.
++// Create the window and GL 3.3 core context; Linux retries with GL 3.0.
+ // Returns false if SDL/GL initialization fails (caller boots as if skipped).
+ bool launcher_platform_open(LauncherPlatform* p, const char* title,
+                             int logical_w, int logical_h);

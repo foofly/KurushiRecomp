@@ -18,6 +18,11 @@ if ! rg -q 'int psx_mod_set_post_aa\(' "$project_dir/psxrecomp/runtime/include/m
     git -C "$project_dir/psxrecomp" apply --check "$framework_patch"
     git -C "$project_dir/psxrecomp" apply "$framework_patch"
 fi
+launcher_patch="$project_dir/recomp-ui-opengl-fallback.patch"
+if ! rg -q 'using OpenGL 3.0 fallback context' "$project_dir/recomp-ui/src/common/launcher_platform_sdl3.c"; then
+    git -C "$project_dir/recomp-ui" apply --check "$launcher_patch"
+    git -C "$project_dir/recomp-ui" apply "$launcher_patch"
+fi
 cmake -S "$project_dir" -B "$build_dir" -G Ninja \
     -DCMAKE_BUILD_TYPE=Release -DPSX_EXECUTION_PROFILE=REFERENCE \
     -DPSX_GL_BATCH_IMPL=LLE -DPSX_ENABLE_VULKAN=OFF -DPSX_DEBUG_TOOLS=ON

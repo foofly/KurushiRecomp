@@ -61,6 +61,12 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Enable launcher fallback for older Linux OpenGL contexts
+        shell: bash
+        run: |
+          git -C recomp-ui apply --check "$GITHUB_WORKSPACE/recomp-ui-opengl-fallback.patch"
+          git -C recomp-ui apply "$GITHUB_WORKSPACE/recomp-ui-opengl-fallback.patch"
+
       - name: Apply tracked framework API patch
         shell: bash
         run: |
@@ -160,6 +166,7 @@ jobs:
             --exe-name Kurushi_Recompiled \
             --display-name "Kurushi Recompiled" \
             --disc-hint "your legally obtained USA I.Q. disc image" \
+            --runtime-dir bios \
             --project-dir assets \
             --project-dir seeds \
             --project-dir mods/preloaded \
@@ -173,6 +180,20 @@ jobs:
             --project-file LICENSE \
             --project-file THIRD_PARTY_NOTICES.md \
             ${{ matrix.toolchain_artifact != 'none' && '--embed-toolchain' || '--no-embed-toolchain' }}
+
+      - name: Verify runtime BIOS in setup archive
+        shell: bash
+        run: python3 tools/check_setup_bios.py dist/kurushi-*-"${{ matrix.artifact }}".zip
+
+      - name: Check launcher rendering with OpenGL 3.0
+        if: matrix.artifact == 'linux-x64'
+        run: >-
+          python3 tools/test_launcher_gl_fallback.py
+          --cc dist/stage-setup-linux-x64/toolchain/bin/clang
+          --cxx dist/stage-setup-linux-x64/toolchain/bin/clang++
+          --sdl-source dist/stage-setup-linux-x64/toolchain/deps
+          --sdl-build dist/stage-setup-linux-x64/toolchain/deps
+          --sdl-library dist/stage-setup-linux-x64/toolchain/deps/lib/libSDL3.a
 
       - name: Check AppImage setup layout
         if: matrix.artifact == 'linux-x64'
