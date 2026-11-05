@@ -1,0 +1,12 @@
+diff --git a/tools/package_setup_host.sh b/tools/package_setup_host.sh
+--- a/tools/package_setup_host.sh
++++ b/tools/package_setup_host.sh
+@@ -470,7 +470,7 @@
+ copy_tree_filtered "${ROOT}/psxrecomp" "${STAGE}/psxrecomp" \
+   --exclude '.git' \
+   --exclude 'recompiler/build' \
+-  --exclude 'generated' \
++  --exclude '/generated' \
+   --exclude '__pycache__' \
+   --exclude 'build' \
+   --exclude 'build-*'

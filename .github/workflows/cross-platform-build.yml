@@ -75,6 +75,15 @@ jobs:
           git -C psxrecomp apply --unidiff-zero --check "$GITHUB_WORKSPACE/psxrecomp-portable-toolchain-posix.patch"
           git -C psxrecomp apply --unidiff-zero "$GITHUB_WORKSPACE/psxrecomp-portable-toolchain-posix.patch"
 
+      - name: Preserve dependency headers in setup SDK
+        shell: bash
+        run: |
+          git -C psxrecomp apply --check "$GITHUB_WORKSPACE/psxrecomp-setup-source-packaging.patch"
+          git -C psxrecomp apply "$GITHUB_WORKSPACE/psxrecomp-setup-source-packaging.patch"
+
+      - name: Check portable toolchain activation
+        run: python3 tools/test_portable_toolchain.py
+
       - name: Update setup package instructions for embedded tools
         shell: bash
         run: |

@@ -44,6 +44,7 @@ class AppImageLayoutTest(unittest.TestCase):
                 "import json, os, sys\n"
                 "print(json.dumps(dict(cwd=os.getcwd(), args=sys.argv[1:], "
                 "root=os.environ.get('KURUSHIRECOMP_PROJECT_ROOT'), "
+                "cmake=os.environ.get('CMAKE'), "
                 "build=os.environ.get('KURUSHIRECOMP_BUILD_DIR'), "
                 "appimage=os.environ.get('APPIMAGE'), "
                 "relaunch=os.environ.get('RECOMP_APPIMAGE_PATH'))))\n"
@@ -60,11 +61,11 @@ class AppImageLayoutTest(unittest.TestCase):
             app_run.write_text(source)
             # Match squashfs permissions: inputs cannot be edited in place.
             for path in payload.rglob("*"):
-                path.chmod(0o555 if path.is_dir() else 0o444)
+                path.chmod(0o555 if path.is_dir() or path.name == "cmake" else 0o444)
             payload.chmod(0o555)
             env = dict(os.environ, APPDIR=str(appdir),
                        APPIMAGE=str(base / "Kurushi.AppImage"),
-                       KURUSHIRECOMP_DATA_DIR=str(data))
+                       KURUSHIRECOMP_DATA_DIR=str(data), CMAKE="")
             try:
                 def launch():
                     result = subprocess.run(
@@ -75,6 +76,7 @@ class AppImageLayoutTest(unittest.TestCase):
                 observed = launch()
                 self.assertEqual(observed["cwd"], str(data))
                 self.assertEqual(observed["root"], str(data))
+                self.assertEqual(observed["cmake"], str(data / "toolchain/bin/cmake"))
                 self.assertEqual(observed["build"], str(data / "build-release"))
                 self.assertEqual(observed["args"], ["--setup-selfcheck", "argument with spaces"])
                 self.assertIsNone(observed["appimage"])

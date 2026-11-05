@@ -93,6 +93,11 @@ for tree in toolchain overlay_toolchain; do
         fi
     fi
 done
+# The setup host probes CMake as a file as well as running it. Give it an
+# absolute bundled path; a bare name found on PATH fails that file probe.
+if [ -z "${CMAKE:-}" ] && [ -x "$data_dir/toolchain/bin/cmake" ]; then
+    export CMAKE="$data_dir/toolchain/bin/cmake"
+fi
 for file in game.toml game_options.toml LICENSE README.md START_HERE.txt AOT_CACHE_AUDIT.json VERSION RELEASE_NOTES.md RELEASE_MANIFEST.json; do
     if [ -f "$payload/$file" ]; then
         cp -f "$payload/$file" "$data_dir/$file"
